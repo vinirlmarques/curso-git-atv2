@@ -14,8 +14,8 @@ table.insert(list, 15)
 
 -- Imprime a lista completa usando um loop
 print ("Lista completa:")
-for position in pairs(list) do
-    print ("Elemento " .. position .. ": " .. list[position])
+for position, value in pairs(list) do
+    print ("Elemento " .. position .. ": " .. value)
 end
 
 -- Ultima etapa
