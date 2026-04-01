@@ -80,6 +80,7 @@ end
 
 printUsers()
 createUser("Carlin", 22)
+createUser("Ana", 17) -- Deve gerar erro por ser menor de idade
 printUsers()
 deleteUser(2)
 printUsers()
