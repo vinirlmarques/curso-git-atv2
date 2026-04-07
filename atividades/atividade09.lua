@@ -1,4 +1,4 @@
--- Importa funções auxiliares
+-- Import the auxiliary functions for the Battleship game
 local aux = require("atividades.utils_atividade09")
 
 isDevMode = false -- Set to true to reveal ship positions on the enemy board (for testing purposes)
