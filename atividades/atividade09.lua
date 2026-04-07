@@ -1,7 +1,7 @@
 -- Importa funções auxiliares
 local aux = require("atividades.utils_atividade09")
 
-isDevMode = true
+isDevMode = false -- Set to true to reveal ship positions on the enemy board (for testing purposes)
 
 
 
@@ -13,7 +13,7 @@ function createBoard(size)
     for i = 1, size do
         board[i] = {}
         for j = 1, size do
-            board[i][j] = "~" 
+            aux.setCell(board, i, j, "~")
         end
     end
     return board
@@ -45,7 +45,7 @@ function printBoards(playerBoard, enemyBoard)
         -- Player board
         io.write(i .. " ")
         for j = 1, cols do
-            io.write(aux.formatCell(playerBoard[i][j], isDevMode) .. " ")
+            io.write(aux.formatPlayerCell(aux.getCell(playerBoard, i, j)) .. " ")
         end
         
         io.write("             ")
@@ -53,7 +53,7 @@ function printBoards(playerBoard, enemyBoard)
         -- Enemy board
         io.write(i .. " ")
         for j = 1, cols do
-            io.write(aux.formatCell(enemyBoard[i][j], isDevMode) .. " ")
+            io.write(aux.formatEnemyCell(aux.getCell(enemyBoard, i, j), isDevMode) .. " ")
         end
         io.write("\n")
     end
@@ -98,7 +98,7 @@ function validatePosition(board, row, col, action)
     -- Actions for ship placement
     if action == "place" then
         -- If there is already a ship in this position, return error
-        if board[row][col] == "S" then
+        if aux.getCell(board, row, col) == "S" then
             return false, "There is already a ship in this position."
         end
     end
@@ -106,7 +106,7 @@ function validatePosition(board, row, col, action)
     -- Actions for attack
     if action == "attack" then
         -- If this position has already been attacked, return error
-        if (board[row][col] == "O" or board[row][col] == "X") then
+        if (aux.getCell(board, row, col) == "O" or aux.getCell(board, row, col) == "X") then
             return false, "Position already attacked."
         end
     end
@@ -130,7 +130,7 @@ function placeShip(targetBoard, position)
     end
 
     -- Place the ship at the position
-    targetBoard[row][col] = "S"
+    aux.setCell(targetBoard, row, col, "S")
     return true
 end
 
@@ -152,11 +152,11 @@ function attackPosition(targetBoard, position)
     end
 
     -- Attack the position
-    if targetBoard[row][col] == "S" then
-        targetBoard[row][col] = "O"  -- Hit ship
+    if aux.getCell(targetBoard, row, col) == "S" then
+        aux.setCell(targetBoard, row, col, "O")  -- Hit ship
         return true, true
     else
-        targetBoard[row][col] = "X"  -- Miss
+        aux.setCell(targetBoard, row, col, "X")  -- Miss
         return true, false
     end
 end
@@ -191,13 +191,13 @@ function playerAttack(enemyBoard, position)
     end
     if hit then
         print("You attacked " .. position .. " and hit a ship!")
-        player.score = player.score + 1
+        aux.setScore(player, aux.getScore(player) + 1)
     else
         print("You attacked " .. position .. " and missed.")
-        player.misses = player.misses + 1
+        aux.setMisses(player, aux.getMisses(player) + 1)
     end
-    print("Your attacks: " .. player.score .. " hits, " .. player.misses .. " misses")
-    return true, checkWin(player.score, numShips, "You")
+    print("Your attacks: " .. aux.getScore(player) .. " hits, " .. aux.getMisses(player) .. " misses")
+    return true, checkWin(aux.getScore(player), numShips, "You")
 end
 
 
@@ -213,7 +213,7 @@ function enemyPlaceShips(enemyBoard)
         local col = math.random(1, #enemyBoard[1])
         
         -- Checks if the position already has a ship
-        if enemyBoard[row][col] ~= "S" then
+        if aux.getCell(enemyBoard, row, col) ~= "S" then
             local position = aux.numberToLetter(col) .. row
             -- Places the ship in the generated position
             placeShip(enemyBoard, position)
@@ -229,7 +229,7 @@ function enemyAttack(playerBoard)
     local col = math.random(1, #playerBoard[1])
     
     -- Ensures that the generated position has not been attacked yet
-    while playerBoard[row][col] == "O" or playerBoard[row][col] == "X" do
+    while aux.getCell(playerBoard, row, col) == "O" or aux.getCell(playerBoard, row, col) == "X" do
         row = math.random(1, #playerBoard)
         col = math.random(1, #playerBoard[1])
     end
@@ -240,13 +240,13 @@ function enemyAttack(playerBoard)
     local valid, hit = attackPosition(playerBoard, position)
     if hit then
         print("Enemy attacked " .. position .. " and hit a ship!")
-        enemy.score = enemy.score + 1
+        aux.setScore(enemy, aux.getScore(enemy) + 1)
     else
         print("Enemy attacked " .. position .. " and missed.")
-        enemy.misses = enemy.misses + 1
+        aux.setMisses(enemy, aux.getMisses(enemy) + 1)
     end
-    print("Enemy attacks: " .. enemy.score .. " hits, " .. enemy.misses .. " misses")
-    return checkWin(enemy.score, numShips, "Enemy")
+    print("Enemy attacks: " .. aux.getScore(enemy) .. " hits, " .. aux.getMisses(enemy) .. " misses")
+    return checkWin(aux.getScore(enemy), numShips, "Enemy")
 end
 
 
@@ -291,7 +291,7 @@ function gameLoop()
     
     while not gameOver do
         printBoards(player.board, enemy.board)
-        print("\nScore: You " .. player.score .. " x " .. enemy.score .. " Enemy")
+        print("\nScore: You " .. aux.getScore(player) .. " x " .. aux.getScore(enemy) .. " Enemy")
         
         -- Player's turn
         local validAttack = false
@@ -325,8 +325,8 @@ function gameLoop()
     
     printBoards(player.board, enemy.board)
     print("\n=== GAME OVER ===")
-    print("You: " .. player.score .. " hits, " .. player.misses .. " misses")
-    print("Enemy: " .. enemy.score .. " hits, " .. enemy.misses .. " misses")
+    print("You: " .. aux.getScore(player) .. " hits, " .. aux.getMisses(player) .. " misses")
+    print("Enemy: " .. aux.getScore(enemy) .. " hits, " .. aux.getMisses(enemy) .. " misses")
 end
 
 -- Core

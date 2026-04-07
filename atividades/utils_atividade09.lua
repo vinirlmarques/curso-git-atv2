@@ -27,8 +27,20 @@ function aux.numberToLetter(num)
     return letters[num] or "?"
 end
 
--- Format board cell for display
-function aux.formatCell(cell, isDevMode)
+-- Format player board cell for display (always shows real values)
+function aux.formatPlayerCell(cell)
+    if cell == "~" or cell == "S" then
+        return cell
+    elseif cell == "O" then
+        return "O"
+    elseif cell == "X" then
+        return "X"
+    end
+    return "?"
+end
+
+-- Format enemy board cell for display (respects devMode)
+function aux.formatEnemyCell(cell, isDevMode)
     if cell == "~" or cell == "S" then
         if isDevMode then
             return cell
@@ -40,6 +52,36 @@ function aux.formatCell(cell, isDevMode)
         return "X"
     end
     return "?"
+end
+
+-- Get cell value from board
+function aux.getCell(board, row, col)
+    return board[row][col]
+end
+
+-- Set cell value on board
+function aux.setCell(board, row, col, value)
+    board[row][col] = value
+end
+
+-- Get score from entity (player or enemy)
+function aux.getScore(entity)
+    return entity.score
+end
+
+-- Set score on entity (player or enemy)
+function aux.setScore(entity, value)
+    entity.score = value
+end
+
+-- Get misses from entity (player or enemy)
+function aux.getMisses(entity)
+    return entity.misses
+end
+
+-- Set misses on entity (player or enemy)
+function aux.setMisses(entity, value)
+    entity.misses = value
 end
 
 return aux
